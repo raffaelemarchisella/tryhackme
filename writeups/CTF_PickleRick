@@ -3,14 +3,8 @@ This Rick and Morty-themed challenge requires you to exploit a web server and fi
 Deploy the virtual machine on this task and explore the web application: 10.10.241.28
 ###
 While performing an nmap scan of the target, I checked the Web site
-and found this in the Source code
-<!--
+and found soomething in the Source code
 
-    Note to self, remember username!
-
-    Username: R1ckRul3s
-
-  -->
   nmap -A -v -T4 -sV 10.10.241.28
 result in 11 seconds
 PORT   STATE SERVICE VERSION
@@ -28,11 +22,10 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 #
 Now I think I'll start some enum on the target web server
 http://10.10.241.28/login.php
-/icons/small
+with gobuster
 #
-i got the password in the /robots.txt 
-absurd.
-Password: Wubbalubbadubdub
+but i got the password in the /robots.txt 
+Password: ****************
 ###
 once gained access to the Web site we have access to the the Server, open to command execution
 pwd
