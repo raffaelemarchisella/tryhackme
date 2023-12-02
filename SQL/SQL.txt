@@ -1,0 +1,69 @@
+	SQL
+Cos'è? Structured Query Language
+E' il modo in cui comunichiamo con un database. 
+E' un linguaggio ricco di features usato per fare delle query ad un database - anche chiamate 'statements'.
+Queste query vengono usate per raccogliere, aggiornare, inserire e cancellare dati da un database.
+=================================================
+SELECT
+Questa query (comando) ci consente di selezionare e raccogliere un dato da una tabella
+la sintassi base è: 
+SELECT * from users;
+dove SELECT è il comando
+* tutto
+FROM da dove prenderla
+users è la tabella
+; indica la fine della colonna
+#
+, può essere usata per selezionare più di un elemento
+SELECT username,password FROM users;
+#
+select * from users LIMIT 1;
+LIMIT 1 raccoglie solo una fila (la prima)
+LIMIT 1,1 skippa la prima fila
+LIMIT 2,1 skippa le prime due
+#
+si può anche fare una selezione più specifica
+SELECT * FROM users WHERE username='admin';
+SELECT * FROM users WHERE username != 'admin';
+è utilizzato per prendere tutti i risultati, e selezionare dalla tab users
+il risultato dove username corrisponde ad 'admin' o è diverso da 'admin'
+#
+SELECT * FROM users WHERE username='admin' AND password='p4ssw0rd'
+AND può essere usato per selezionare più di un risultato specifico
+#
+LIKE è usato per intendere risultati contenenti una lettera o numero indicato
+SELECT * FROM users WHERE username LIKE 'a%'
+dove l'username inizia con una 'a'
+SELECT * FROM users WHERE username LIKE '%n'
+dove l'username finisce con una 'n'
+SELECT * FROM users WHERE username LIKE '%mi%'
+dove l'username contiene 'mi'
+=================================================
+UNION 
+E' usato per effettivamente unire due tabelle in un risultato unico.
+SELECT name,address,city,postcode from customers UNION SELECT company,address,city,postcode from suppliers;
+dove name e company verranno unite sotto un'unica colonna, e SQL mostrerà un'unica tabella
+comprendente tutte queste informazioni riorganizzate insieme
+=================================================
+INSERT
+Servirà per inserire nuovi dati in una nuova fila
+INSERT into users (username,password) value ('bob','password123');
+into users indica la tabella nella quale inserire 
+(username,password) sono le colonne nelle quali lavorare
+value ('bob','password123') indica poi che valori inserire in quelle colonne specificate
+=================================================
+UPDATE
+Usato per aggiornare o modificare una fila
+UPDATE users SET username='root',password='pass123' where username='admin';
+ci dice di aggiornare la tabella 'users' e di settare un nuovo username e password
+specificando con la clausola WHERE precisamente quale fila modificare (username='admin')
+=================================================
+DELETE
+Ci permette di eliminare una o più file appartenenti a una tabella. Anche qui possiamo usare la 
+clausola WHERE per essere più precisi, così come LIMIT per indicare il numero di file cancellate.
+DELETE FROM users WHERE username='martin';
+cancellerà dalla tabella users la fila dove username è 'martin'
+#
+DELETE FROM users;
+cancellerà invece tutti i contentenuti della tabella (tutte le sue file, non tocca le colonne)
+===================================================================================================

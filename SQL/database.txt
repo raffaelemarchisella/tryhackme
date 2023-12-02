@@ -1,0 +1,27 @@
+I dati che servono a una compagnia, sono spesso e volentieri
+salvati all'interno di un server database.
+Un database si occupa di mantenere questi dati.
+Questo server è gestito con il DBMS (DatabaseManagementSystem)
+Che a sua volta ha due tipologie: Relazionali e Non-Relazionali
+=================================================
+Ad esempio un server database può possedere un database per lo shop, uno per lo staff e uno 
+per gli account.
+In quello dello shop ad esempio potremo trovare immagazzinati gli oggetti in vendita, 
+li username degli account dei clienti e le loro password.
+
+	COME VENGONO GESTITI I DATI ALL'INTERNO DEI DATABASE
+LE TABELLE
+Possiedono COLONNE e FILE - possiedono ognuna il loro proprio nome identificativo
+#
+COLONNE
+Sono numerate da una primary key e possono settare la tipologia di dati che contengono:
+numeri, stringhe, date. Ovviamente, possono contenere diversissimi tipi di dati e informazioni.
+
+FILE
+E' dove la linea del dato vero e proprio è contenuta - ogni volta che viene creato un nuovo record (una nuova registrazione) o un dato è aggiunto alla tabella verrà creata una nuova fila
+##
+2 TIPI DI DATABASE
+RELAZIONALI
+In cui un database comunica e si riferisce ad un altro creando delle vere e proprie relazioni tra di essi.
+Ad esempio un db shop potrebbe relazionarsi con quello 
+NON-RELAZIONALI
