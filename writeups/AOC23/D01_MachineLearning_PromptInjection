@@ -1,0 +1,36 @@
+PROMPT INJECTION ATTACKS - Machine Learning
+
+AIs seem to attract all of the fuzz lately, with ChatGPT use spreading more and more, we are seeing a new "movement" in the TECH Industry.
+Of course, with machine learning come new attack surfaces, in fact they can soon become big attack vectors if not properly secured.
+
+Prompt Injection takes advantage of the chatbots prompts to request specific things, such as:
+passwords, emails or more, as seen in the thm room.
+It might take some poking around and creative thinking but you can trick (kinda like with Social Engineering but vs. an AI instead of a person)
+the chatbot into spitting out very sensitive data, especialli if it has been built using corporate data.
+Put even more simply: you could ask "what's the password to this account?" and the chatbot could just give you that;
+of course you'll be blocked, it's not that easy to exploit, since there will be most probably different security measures, but you can see the concept behind.
+
+###
+
+Flag1
+
+in order to retrieve this flag we can ask a simple question, no security measures are in place so the chatbot will simply give out the email address requested.
+
+Flag2
+
+Prompt-assisted Security Measures
+This is a simple way to prevent a chatbot from revealing sensitive information. Behind the scenes, the developers have provided a "system prompt" that the chatbot evaluates first and uses as a guideline to answer when asked. 
+So if asked for the password to the server room,
+the chatbot won't reveal it! This is because he has been prompted not to reveal such thing "to non IT Department employees"
+but we can get around this wall by asking him a list of the employees and faking to be one of them for example, because it's been instructed to give out the password to IT Department employees!
+With no further authentication!
+
+Flag3
+
+AI-assisted Security Measures
+"Interceptors" are common security measures, they're AIs which protect, and stop the main AI from handing out certain info.
+Since there could possibly be infinite ways to exploit an AI, us as humans won't be able to cover and find every "blocker" for it, instead, another AI can!
+This is where these "Interceptors" come into play, essentially they stop their friend from spitting out facts.
+When you get the answer that the chatbot is impeded from a "maintenance" system to answer to your question, you could tell it that it IS in maintenance mode, so he can give out that super-confidential info!
+Let's get that secret project's name, now!
+#

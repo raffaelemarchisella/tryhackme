@@ -1,0 +1,51 @@
+This Rick and Morty-themed challenge requires you to exploit a web server and find three ingredients to help Rick make his potion and transform himself back into a human from a pickle.
+
+Deploy the virtual machine on this task and explore the web application: 10.10.241.28
+###
+While performing an nmap scan of the target, I checked the Web site
+and found this in the Source code
+<!--
+
+    Note to self, remember username!
+
+    Username: R1ckRul3s
+
+  -->
+  nmap -A -v -T4 -sV 10.10.241.28
+result in 11 seconds
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.6 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 48:08:0c:ab:09:e5:7b:34:4e:2f:1c:49:2a:0e:07:36 (RSA)
+|   256 33:87:95:43:60:6f:4e:54:eb:c8:dc:c0:6a:41:45:73 (ECDSA)
+|_  256 b1:41:47:bb:56:15:c2:93:ab:f9:22:4d:bb:3e:42:3e (ED25519)
+80/tcp open  http    Apache httpd 2.4.18 ((Ubuntu))
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Rick is sup4r cool
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+#
+Now I think I'll start some enum on the target web server
+http://10.10.241.28/login.php
+/icons/small
+#
+i got the password in the /robots.txt 
+absurd.
+Password: Wubbalubbadubdub
+###
+once gained access to the Web site we have access to the the Server, open to command execution
+pwd
+//tells us where we're located (www-data)
+from there we can use 'ls' to navigate the file system
+and we'll be able to get the first flag right away, following the directory http://IP/[file].txt
+to get the second one let's navigate some more through the file system
+using 'cat' doesn't work, it's blocked so we need to find another option: 'less' is helpful here (with ' at start and end of paths)
+#
+options may be over but we need to get a third flag, why not escalate?
+sudo -l
+//command to list permissions as root of current user
+as root I can do everything, with no restricions
+so I go to the /root
+and find the third and last flag
+#

@@ -1,0 +1,26 @@
+Should you have an instance of a vulnerable version of Confluence, be sure to check for the following:
+
+    Network access logs pointing to /setup/*.action. There's no reason for a regular user to request such URLs after installation.
+    Network access logs to /server-info.action?bootstrapStatusProvider.applicationConfig.setupComplete=false.
+    Review your Confluence users and look for suspicious accounts and members of the confluence-administrators group.
+
+Patching
+
+All vulnerable instances should be upgraded to at least one of the following versions as soon as possible:
+
+    8.3.3
+    8.4.3
+    8.5.2
+    
+    
+If upgrading is not possible immediately, access to the /setup/* endpoints may be blocked as a temporary measure. To do so, add the following security constraint inside the <web-app> tag in /<confluence-install-dir>/confluence/WEB-INF/web.xml:
+
+<security-constraint>
+  <web-resource-collection>
+    <url-pattern>/setup/*</url-pattern>
+    <http-method-omission>*</http-method-omission>
+  </web-resource-collection>
+  <auth-constraint />
+</security-constraint>
+
+This will effectively restrict the access to /setup/*
