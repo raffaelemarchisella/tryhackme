@@ -1,0 +1,52 @@
+Log Analyisys
+
+Objectives: 
+-python introduction, work with libraries such as Pandas and matploitb
+-log analysys, understand the network, what Data Science involves? How is it applied in CyberSec?
+
+
+###
+
+DATA SCIENCE 101
+Basically it revolves around working with data, interpreting it to answer questions.
+What kind of questions? Depends on the sector, is it e-commerce? is it automotive? is it cybersecurity?
+
+A Data Scientist/Analyst will have different tasks:
+-collecting the data - find and gather data, databases? recent sales? logs? 
+-processing it - make it so that you can actually work on/with it
+-mining data - extracting and connecting info
+-data analysis - understand and make projections
+-communication - this is the final objective to the process, give the answer
+
+DS IN CYBERSEC
+In cybersecurity the understanding of logs, and an effective use of data, can help understanding the network, how it works and possible threats.
+SIEMs: gather data, logs for analysis
+Threat Trends: understand what are the threats in the network and help preventing them
+Predictive analisys: will help understand the future threats' landscape on the network, helping the prevention of these
+
+JUPYTER NOTEBOOKS
+Printing text
+print("text")
+#
+Variables
+a variable works with a label and data
+this is how it works
+label = data
+eg.: name = "jimmy"
+we set a variable
+with 
+print(name)
+we will get
+jimmy
+#
+Lists
+lists can contain multiple values within as variables
+employees ["Jimmy","Cain","Lucas"]
+sooo
+print(employees)
+will list the employees list (thus the variables/the values we set)
+>>>> ["Jimmy","Cain","Lucas"]
+#
+
+
+
